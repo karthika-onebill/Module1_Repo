@@ -1,0 +1,40 @@
+mysql> show tables;
++-------------------+
+| Tables_in_onebill |
++-------------------+
+| customer          |
+| department        |
+| employee          |
+| item              |
+| office            |
+| orders            |
+| passengers        |
+| person_data       |
+| sales             |
+| student           |
++-------------------+
+10 rows in set (0.00 sec)
+
+mysql> truncate table department;
+Query OK, 0 rows affected (0.26 sec)
+
+mysql> describe department;
++----------+-------------+------+-----+---------+-------+
+| Field    | Type        | Null | Key | Default | Extra |
++----------+-------------+------+-----+---------+-------+
+| dept     | varchar(50) | NO   | PRI | NULL    |       |
+| deptname | varchar(50) | YES  |     | NULL    |       |
++----------+-------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> select * from department;
+Empty set (0.00 sec)
+
+mysql> delete table department;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'table department' at line 1
+mysql> drop table department;
+Query OK, 0 rows affected (0.22 sec)
+
+mysql> describe department;
+ERROR 1146 (42S02): Table 'onebill.department' doesn't exist
+mysql> tee /home/karthika/onebill_java_training/java_basics/Assignments_31-05-2020_SQL/thirdmostexpemp.txt

@@ -1,0 +1,97 @@
+mysql> select * from item;
+    -> //
++--------+----------+------+-------+-----------+
+| itemid | itemdesc | qoh  | price | category  |
++--------+----------+------+-------+-----------+
+|      1 | Perfume  |  100 |   100 | Cosmetics |
+|      2 | Marie    |  100 |    10 | Snacks    |
++--------+----------+------+-------+-----------+
+2 rows in set (0.00 sec)
+
+mysql> select * from sales;
+    -> //
++-----+--------+---------+-------+-------+
+| sid | itemid | qtysold | price | total |
++-----+--------+---------+-------+-------+
+| 101 |      2 |      10 |     0 |     0 |
+| 102 |      2 |     100 |    23 |  2300 |
+| 103 |      2 |     200 |    23 |  4600 |
++-----+--------+---------+-------+-------+
+3 rows in set (0.00 sec)
+
+mysql> select itemdesc as Description_of_item,price,qoh as quantity_on_hand from item full outer join sales on item.itemid=sales.itemid order by item.price;
+    -> //
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'outer join sales on item.itemid=sales.itemid order by item.price' at line 1
+mysql> ^C
+mysql> 
+mysql> select * from item left join sales on item.itemid=sales.itemid union select * from item right join sales on item.itemid =sales.itemid;
+    -> //
++--------+----------+------+-------+-----------+------+--------+---------+-------+-------+
+| itemid | itemdesc | qoh  | price | category  | sid  | itemid | qtysold | price | total |
++--------+----------+------+-------+-----------+------+--------+---------+-------+-------+
+|      2 | Marie    |  100 |    10 | Snacks    |  101 |      2 |      10 |     0 |     0 |
+|      2 | Marie    |  100 |    10 | Snacks    |  102 |      2 |     100 |    23 |  2300 |
+|      2 | Marie    |  100 |    10 | Snacks    |  103 |      2 |     200 |    23 |  4600 |
+|      1 | Perfume  |  100 |   100 | Cosmetics | NULL |   NULL |    NULL |  NULL |  NULL |
++--------+----------+------+-------+-----------+------+--------+---------+-------+-------+
+4 rows in set (0.01 sec)
+
+mysql> select * from itemid as ID,itemdesc as Description,qoh as quantity_on_hand fr left join sales on item.itemid=sales.itemid union select qtysold as quantity_sold,price from item right join sales on item.itemid =sales.itemid;
+    -> //
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'fr left join sales on item.itemid=sales.itemid union select qtysold as quantity_' at line 1
+mysql> select * from itemid as ID,itemdesc as Description,qoh as quantity_on_hand from left join sales on item.itemid=sales.itemid union select qtysold as quantity_sold,price from item right join sales on item.itemid =sales.itemid;
+    -> //
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'from left join sales on item.itemid=sales.itemid union select qtysold as quantit' at line 1
+mysql> select itemid as ID,itemdesc as Description,qoh as quantity_on_hand from left join sales on item.itemid=sales.itemid union select qtysold as quantity_sold,price from item right join sales on item.itemid =sales.itemid;
+    -> //
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'left join sales on item.itemid=sales.itemid union select qtysold as quantity_sol' at line 1
+mysql> select itemid as ID,itemdesc as Description,qoh as quantity_on_hand from left join sales on item.itemid=sales.itemid union select qtysold as quantity_sold,price from sales right join item on item.itemid =sales.itemid;
+    -> //
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'left join sales on item.itemid=sales.itemid union select qtysold as quantity_sol' at line 1
+mysql> select * from itemid as ID,itemdesc as Description,qoh as quantity_on_hand fr left join sales on item.itemid=sales.itemid union select qtysold as quantity_sold,price from item right join sales on item.itemid =sales.itemid;
+    -> //
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'fr left join sales on item.itemid=sales.itemid union select qtysold as quantity_' at line 1
+mysql> select * from item left join sales on item.itemid=sales.itemid union select * from item right join sales on item.itemid =sales.itemid;
+    -> //
++--------+----------+------+-------+-----------+------+--------+---------+-------+-------+
+| itemid | itemdesc | qoh  | price | category  | sid  | itemid | qtysold | price | total |
++--------+----------+------+-------+-----------+------+--------+---------+-------+-------+
+|      2 | Marie    |  100 |    10 | Snacks    |  101 |      2 |      10 |     0 |     0 |
+|      2 | Marie    |  100 |    10 | Snacks    |  102 |      2 |     100 |    23 |  2300 |
+|      2 | Marie    |  100 |    10 | Snacks    |  103 |      2 |     200 |    23 |  4600 |
+|      1 | Perfume  |  100 |   100 | Cosmetics | NULL |   NULL |    NULL |  NULL |  NULL |
++--------+----------+------+-------+-----------+------+--------+---------+-------+-------+
+4 rows in set (0.01 sec)
+
+mysql> select itemid as Item_ID,itemdesc as Description,qoh as Quantity_on_hand from item left join sales on item.itemid=sales.itemid union select qtysold as quantity_sold,price from sales right join item on item.itemid=sales.itemid;
+    -> //
+ERROR 1052 (23000): Column 'itemid' in field list is ambiguous
+mysql> select item.itemid as Item_ID,itemdesc as Description,qoh as Quantity_on_hand from item left join sales on item.itemid=sales.itemid union select qtysold as quantity_sold,price from sales right join item on item.itemid=sales.itemid;
+    -> //
+ERROR 1052 (23000): Column 'price' in field list is ambiguous
+mysql> select item.itemid as Item_ID,itemdesc as Description,qoh as Quantity_on_hand from item left join sales on item.itemid=sales.itemid union select qtysold as quantity_sold,sales.price from sales right join item on item.itemid=sales.itemid;
+    -> //
+ERROR 1222 (21000): The used SELECT statements have a different number of columns
+mysql> select item.itemid as Item_ID,item.itemdesc as Description,item.qoh as Quantity_on_hand from item left join sales on item.itemid=sales.itemid union select sales.qtysold as quantity_sold,sales.price from sales right join item on item.itemid=sales.itemid;
+    -> //
+ERROR 1222 (21000): The used SELECT statements have a different number of columns
+mysql> select item.itemid as Item_ID,item.itemdesc as Description,item.qoh as Quantity_on_hand from item left join sales on item.itemid=sales.itemid union select *  from sales right join item on item.itemid=sales.itemid;
+    -> //
+ERROR 1222 (21000): The used SELECT statements have a different number of columns
+mysql> select * from item left join sales on item.itemid=sales.itemid union select *  from sales right join item on item.itemid=sales.itemid;
+    -> //
++--------+----------+------+-------+-----------+------+---------+---------+-------+-----------+
+| itemid | itemdesc | qoh  | price | category  | sid  | itemid  | qtysold | price | total     |
++--------+----------+------+-------+-----------+------+---------+---------+-------+-----------+
+|      2 | Marie    |  100 |    10 | Snacks    |  101 | 2       |      10 |     0 | 0         |
+|      2 | Marie    |  100 |    10 | Snacks    |  102 | 2       |     100 |    23 | 2300      |
+|      2 | Marie    |  100 |    10 | Snacks    |  103 | 2       |     200 |    23 | 4600      |
+|      1 | Perfume  |  100 |   100 | Cosmetics | NULL | NULL    |    NULL |  NULL | NULL      |
+|    101 | 2        |   10 |     0 | 0         |    2 | Marie   |     100 |    10 | Snacks    |
+|    102 | 2        |  100 |    23 | 2300      |    2 | Marie   |     100 |    10 | Snacks    |
+|    103 | 2        |  200 |    23 | 4600      |    2 | Marie   |     100 |    10 | Snacks    |
+|   NULL | NULL     | NULL |  NULL | NULL      |    1 | Perfume |     100 |   100 | Cosmetics |
++--------+----------+------+-------+-----------+------+---------+---------+-------+-----------+
+8 rows in set (0.00 sec)
+
+mysql> tee /home/karthika/onebill_java_training/java_basics/Assignments_31-05-2020_SQL/charandvarchar.txt

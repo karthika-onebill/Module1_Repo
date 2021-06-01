@@ -1,0 +1,68 @@
+mysql> show tables;
++-------------------+
+| Tables_in_onebill |
++-------------------+
+| customer          |
+| employee          |
+| item              |
+| office            |
+| orders            |
+| passengers        |
+| person_data       |
+| sales             |
+| student           |
++-------------------+
+9 rows in set (0.00 sec)
+
+mysql> select * from employee;
++-------+--------+------------------+------------+------------+------------+--------+------+------+--------------------+
+| empid | name   | email            | mobile     | dob        | doj        | gender | exp  | dept | designation        |
++-------+--------+------------------+------------+------------+------------+--------+------+------+--------------------+
+|     1 | Rahul  | r@gmail.com      | 234234234  | 1980-12-30 | 2015-11-09 | m      |    6 | A    | software engineer  |
+|     2 | Rohit  | rohit@gmail.com  | 784234234  | 1983-10-30 | 2014-11-09 | m      |    7 | B    | data engineer      |
+|     3 | Rajath | rajath@gmail.com | 9898678787 | 1993-01-21 | 2020-05-23 | m      |    8 | D    |  Tester            |
+|     4 | Rani   | rani@gmail.com   | 9865432134 | 1993-01-21 | 2020-05-23 | f      |    0 | B    |  Tester            |
+|     5 | Reshma | reshma@gmail.com | 9865432134 | 1999-03-20 | 2020-05-23 | f      |    4 | A    |  Software engineer |
++-------+--------+------------------+------------+------------+------------+--------+------+------+--------------------+
+5 rows in set (0.00 sec)
+
+mysql> ^C
+mysql> select * from employee where max(exp);
+ERROR 1111 (HY000): Invalid use of group function
+mysql> select * from employee where max(exp)>6;
+ERROR 1111 (HY000): Invalid use of group function
+mysql> select max(exp) from employee where max(exp)>6;
+ERROR 1111 (HY000): Invalid use of group function
+mysql> select max(exp) from employee;
++----------+
+| max(exp) |
++----------+
+|        8 |
++----------+
+1 row in set (0.00 sec)
+
+mysql> select max(exp) from employee where exp < (select max(exp) from employee);
++----------+
+| max(exp) |
++----------+
+|        7 |
++----------+
+1 row in set (0.01 sec)
+
+mysql> select max(exp) from employee where exp < (select max(exp) from employee where exp<(select max(exp) from employee));
++----------+
+| max(exp) |
++----------+
+|        6 |
++----------+
+1 row in set (0.00 sec)
+
+mysql> select max(exp) as third_most_experience_employee from employee where exp < (select max(exp) from employee where exp<(select max(exp) from employee));
++--------------------------------+
+| third_most_experience_employee |
++--------------------------------+
+|                              6 |
++--------------------------------+
+1 row in set (0.00 sec)
+
+mysql> exit

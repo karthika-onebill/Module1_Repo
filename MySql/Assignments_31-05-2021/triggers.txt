@@ -1,0 +1,93 @@
+
+mysql> show databases;
+    -> //
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| onebill            |
+| performance_schema |
+| sys                |
++--------------------+
+5 rows in set (0.00 sec)
+
+mysql> use onebill;
+ERROR 1049 (42000): Unknown database 'onebill;'
+mysql> show tables;
+    -> //
++-------------------+
+| Tables_in_onebill |
++-------------------+
+| customer          |
+| employee          |
+| item              |
+| office            |
+| orders            |
+| passengers        |
+| person_data       |
+| sales             |
+| student           |
++-------------------+
+9 rows in set (0.00 sec)
+
+mysql> select * from item;
+    -> //
++--------+----------+------+-------+-----------+
+| itemid | itemdesc | qoh  | price | category  |
++--------+----------+------+-------+-----------+
+|      1 | Perfume  |   77 |   100 | Cosmetics |
+|      2 | Marie    |  100 |    10 | Snacks    |
++--------+----------+------+-------+-----------+
+2 rows in set (0.00 sec)
+
+mysql> select * from sales;
+    -> //
++-----+--------+---------+-------+-------+
+| sid | itemid | qtysold | price | total |
++-----+--------+---------+-------+-------+
+| 101 |      2 |      10 |     0 |     0 |
+| 102 |      2 |     100 |    23 |  2300 |
+| 103 |      2 |     200 |    23 |  4600 |
+| 104 |      1 |      23 |    45 |  1035 |
++-----+--------+---------+-------+-------+
+4 rows in set (0.00 sec)
+
+mysql> delimiter //
+mysql> delimiter //
+mysql> create trigger t3
+    -> after insert
+    -> on sales
+    -> for each row
+    -> begin
+    -> update item set qoh=qoh-new.qtysold where itemid=new.itemid;
+    -> end//
+Query OK, 0 rows affected (0.43 sec)
+
+mysql> insert into sales values(105,2,3,90,0);
+    -> //
+Query OK, 1 row affected (0.10 sec)
+
+mysql> select * from sales;
+    -> //
++-----+--------+---------+-------+-------+
+| sid | itemid | qtysold | price | total |
++-----+--------+---------+-------+-------+
+| 101 |      2 |      10 |     0 |     0 |
+| 102 |      2 |     100 |    23 |  2300 |
+| 103 |      2 |     200 |    23 |  4600 |
+| 104 |      1 |      23 |    45 |  1035 |
+| 105 |      2 |       3 |    90 |   270 |
++-----+--------+---------+-------+-------+
+5 rows in set (0.00 sec)
+
+mysql> select * from item;
+    -> //
++--------+----------+------+-------+-----------+
+| itemid | itemdesc | qoh  | price | category  |
++--------+----------+------+-------+-----------+
+|      1 | Perfume  |   77 |   100 | Cosmetics |
+|      2 | Marie    |   94 |    10 | Snacks    |
++--------+----------+------+-------+-----------+
+2 rows in set (0.00 sec)
+

@@ -1,0 +1,239 @@
+mysql> show databses;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'databses' at line 1
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| onebill            |
+| performance_schema |
+| sys                |
++--------------------+
+5 rows in set (0.00 sec)
+
+mysql> use onebill;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> select * from office;
++------------+--------------+--------+----------+----------+-------+---------+------------+--------------------------+
+| officeCode | city         | phone  | address1 | address2 | state | country | postalcode | status                   |
++------------+--------------+--------+----------+----------+-------+---------+------------+--------------------------+
+|          1 | San Francico | NULL   | sdsd     | sdsd     | CA    | USA     |      98040 | onboarding...            |
+|          2 | San Diego    | NULL   | sdsd     | sdsd     | CA    | USA     |      98041 | temperory closing....    |
+|          3 | Middletown   | 420023 | sdsd     | sdsd     | NY    | UK      |       8041 | opening all weekends.... |
++------------+--------------+--------+----------+----------+-------+---------+------------+--------------------------+
+3 rows in set (0.00 sec)
+
+mysql> delimiter //
+mysql> create procedure todisplayStatus(
+    -> IN cityName varchar(50))
+    -> begin
+    -> select status from office where city=cityName;
+    -> end //
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> call todisplayStatus('San Francico');
+    -> delimiter ;
+    -> //
++---------------+
+| status        |
++---------------+
+| onboarding... |
++---------------+
+1 row in set (0.00 sec)
+
+Query OK, 0 rows affected (0.00 sec)
+
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'delimiter' at line 1
+mysql> select * from orders;
+    -> end//
++------+--------+------+
+| o_id | amount | c_id |
++------+--------+------+
+|  601 |  10000 |    1 |
+|  602 |  20000 |    4 |
+|  603 |  15000 |    2 |
++------+--------+------+
+3 rows in set (0.00 sec)
+
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'end' at line 1
+mysql> delimiter //
+mysql> create procedure todisplaytotalamount(
+    -> IN order_id int(10),
+    -> OUT total INT)
+    -> begin
+    -> select sum(amount) into total from orders where o_id=order_id;
+    -> end//
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> call todisplaytotalamount(601);
+    -> end//
+ERROR 1318 (42000): Incorrect number of arguments for PROCEDURE onebill.todisplaytotalamount; expected 2, got 1
+mysql> alter table orders add column status varchar(50);
+    -> //
+Query OK, 0 rows affected (1.07 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> update orders set status="pending" ehere o_id=601;
+    -> //
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'ehere o_id=601' at line 1
+mysql> update orders set status="pending" where o_id=601;
+    -> //
+Query OK, 1 row affected (0.12 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update orders set status="pending" where o_id=602;
+    -> //
+Query OK, 1 row affected (0.12 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> select * from orders;
+    -> //
++------+--------+------+---------+
+| o_id | amount | c_id | status  |
++------+--------+------+---------+
+|  601 |  10000 |    1 | pending |
+|  602 |  20000 |    4 | pending |
+|  603 |  15000 |    2 | NULL    |
++------+--------+------+---------+
+3 rows in set (0.00 sec)
+
+mysql> update orders set status="shipping" where o_id=603;
+    -> //
+Query OK, 1 row affected (0.10 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> select * from orders;
+    -> //
++------+--------+------+----------+
+| o_id | amount | c_id | status   |
++------+--------+------+----------+
+|  601 |  10000 |    1 | pending  |
+|  602 |  20000 |    4 | pending  |
+|  603 |  15000 |    2 | shipping |
++------+--------+------+----------+
+3 rows in set (0.00 sec)
+
+mysql> delimiter //
+mysql> create procedure todisplayorderstatusinfo(OUT total INT)
+    -> begin
+    -> select sum(amount) into total from orders where status="pending";
+    -> end//
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> call todisplayorderstatusinfo(@total);
+    -> select @total as total_amount;
+    -> //
+Query OK, 1 row affected (0.00 sec)
+
++--------------+
+| total_amount |
++--------------+
+|        30000 |
++--------------+
+1 row in set (0.00 sec)
+
+mysql> select * from customer;
+    -> //
++------+---------------+-------------+
+| c_id | customer_name | designation |
++------+---------------+-------------+
+|    1 | Rohan         | Engineer    |
+|    2 | Raj           | Tester      |
+|    3 | Rohit         | Analyst     |
+|    4 | Nandhan       | HR          |
++------+---------------+-------------+
+4 rows in set (0.00 sec)
+
+mysql> select * from items;
+    -> //
+ERROR 1146 (42S02): Table 'onebill.items' doesn't exist
+mysql> select * from item;
+    -> //
++--------+----------+------+-------+-----------+
+| itemid | itemdesc | qoh  | price | category  |
++--------+----------+------+-------+-----------+
+|      1 | Perfume  |  100 |   100 | Cosmetics |
+|      2 | Marie    |  100 |    10 | Snacks    |
++--------+----------+------+-------+-----------+
+2 rows in set (0.00 sec)
+
+mysql> delimiter //
+mysql> create procedure toreducequantity(IN id int,INOUT quantity int)
+    -> begin
+    -> set quantity = quantity-id;
+    -> end//
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> set @id=10;
+    -> call toreducequantity(@id,100);
+    -> //
+Query OK, 0 rows affected (0.00 sec)
+
+ERROR 1414 (42000): OUT or INOUT argument 2 for routine onebill.toreducequantity is not a variable or NEW pseudo-variable in BEFORE trigger
+mysql> set @id=10;
+    -> call toreducequantity(@id,100);
+    -> select $id;
+    -> //
+Query OK, 0 rows affected (0.00 sec)
+
+ERROR 1414 (42000): OUT or INOUT argument 2 for routine onebill.toreducequantity is not a variable or NEW pseudo-variable in BEFORE trigger
+mysql> select * from item;
+    -> //
++--------+----------+------+-------+-----------+
+| itemid | itemdesc | qoh  | price | category  |
++--------+----------+------+-------+-----------+
+|      1 | Perfume  |  100 |   100 | Cosmetics |
+|      2 | Marie    |  100 |    10 | Snacks    |
++--------+----------+------+-------+-----------+
+2 rows in set (0.00 sec)
+
+mysql> delimiter //
+mysql> create procedure purchaseitem(IN quantity int,INOUT no_of_items int)
+    -> begin
+    -> set no_of_item = no_of_items+quantity;
+    -> end//
+ERROR 1193 (HY000): Unknown system variable 'no_of_item'
+mysql> delimiter //
+mysql> create procedure purchase(IN no_of_items,INOUT quantity int)
+    -> begin
+    -> set quantity = quantity-no_of_items;
+    -> end//
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'INOUT quantity int)
+begin
+set quantity = quantity-no_of_items;
+end' at line 1
+mysql> delimiter
+ERROR: 
+DELIMITER must be followed by a 'delimiter' character or string
+mysql> delimiter //
+mysql> create procedure reducequantity(
+    -> INOUT quantity int,
+    -> IN noitem int)
+    -> begin
+    -> set quantity = quantity-noitem;
+    -> end//
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> set @quantity =100;
+    -> call reducequantity(@quantity,5);
+    -> call reducequantity(@quantity,3);
+    -> select @quantity;
+    -> //
+Query OK, 0 rows affected (0.00 sec)
+
+Query OK, 0 rows affected (0.00 sec)
+
+Query OK, 0 rows affected (0.00 sec)
+
++-----------+
+| @quantity |
++-----------+
+|        92 |
++-----------+
+1 row in set (0.00 sec)
+
+mysql> tee /home/karthika/onebill_java_training/java_basics/Assignments_31-05-2020_SQL/trigger.txt
